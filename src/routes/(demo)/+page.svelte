@@ -50,6 +50,9 @@
   <Card title="Selection modals" mode="featured" href="{base}/modals">
     Example modals for making selections on pages.
   </Card>
+    <Card title="Svelte plot" mode="featured" href="{base}/svelteplot">
+    Demo of svelteplot charts.
+  </Card>
 </Grid>
 
 <Footer compact />
