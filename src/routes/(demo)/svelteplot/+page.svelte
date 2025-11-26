@@ -29,7 +29,8 @@
     xKey: "value",
     yKey: "areacd",
     ySort: "ascending",
-    dataLabels: {format: ",.0f"}
+    dataLabels: {format: ",.0f"},
+    xAxisLabel: "Population"
   }
 
   let stackedBarConfig = {
@@ -41,7 +42,7 @@
     yFormat: "%Y",
     yFormatDate: "%Y-%m-%d",
     ySort: "ascending",
-    zSortKey: "E12000004"
+    xAxisTicks: 3
   }
 
   let clusteredBarConfig = {

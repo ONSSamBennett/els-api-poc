@@ -1,5 +1,5 @@
 <script>
-    import { Plot, GridX, BarX, AxisX, AxisY, Text, HTMLTooltip, Pointer } from 'svelteplot';
+    import { Plot, GridX, BarX, AxisX, AxisY, Text, RuleX } from 'svelteplot';
     import { format } from "d3-format";
     import { timeParse, timeFormat} from "d3-time-format"
     import { extent, min, max, sum, sort, ascending, descending } from "d3-array"
@@ -9,7 +9,9 @@
         variant = "simple",
         xKey, 
         yKey,
-        zKey, 
+        zKey,
+        xAxisLabel,
+        yAxisLabel, 
         xDomain = "auto",
         xFormat,
         xFormatDate,
@@ -119,9 +121,19 @@
     marginTop={margin.top} 
     marginBottom={margin.bottom} 
     height = {derivedHeight ? derivedHeight : height} 
-    y={{ domain: variant == "clustered" ? null : domainY, tickSpacing: 10, label:"", tickFormat: (d) => variant == "clustered" ? "" : yFormatDate ? timeFormat(yFormat)(timeParse(yFormatDate)(d)) : yFormat ? format(yFormat)(d) : d}} 
-    x={{ domain: domainX, label:""}}
-    color={{ legend: variant == "clustered" || variant == "stacked" ? true : false}}
+    y={{ 
+        domain: variant == "clustered" ? null : domainY, 
+        tickSpacing: 10, 
+        label: yAxisLabel ? yAxisLabel : "",
+        tickFormat: (d) => variant == "clustered" ? "" : yFormatDate ? timeFormat(yFormat)(timeParse(yFormatDate)(d)) : yFormat ? format(yFormat)(d) : d
+    }} 
+    x={{ 
+        domain: domainX, 
+        label:xAxisLabel ? xAxisLabel : ""
+    }}
+    color={{ 
+        legend: variant == "clustered" || variant == "stacked" ? true : false
+    }}
     fy={{
         axis: 'left',
         anchor: 'left',
@@ -174,29 +186,15 @@
 	}
 	:global(text){
 		font-family: 'OpenSans', 'Helvetica Neue', arial, sans-serif !important;
-	}
-	:global(.tick text){
-		font-size: 16px !important;
+        font-size: 14px !important;
 	}
     :global(.dataLabel){
         font-weight: 600 !important;
-        font-size: 14px !important;
     }
     :global(.item){
-        font-size: 16px !important;
+        font-size: 14px !important;
     }
     :global(.item rect){
         ry: 12;
-    }
-    .tooltip {
-        background: white;
-        border-color: #414042;
-        font-size: 14px;
-        padding: 1ex 1em;
-        border-radius: 3px;
-        line-height: 1.2;
-        /* box-shadow:
-            rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
-            rgba(0, 0, 0, 0.3) 0px 1px 3px -1px; */
     }
 </style>
