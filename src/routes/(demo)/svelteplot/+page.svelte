@@ -28,22 +28,42 @@
     variant: "simple",
     xKey: "value",
     yKey: "areacd",
-    ySort: "descending"
+    ySort: "ascending",
+    dataLabels: {format: ",.0f"}
   }
 
   let stackedBarConfig = {
     variant: "stacked",
+    height: 150,
     xKey: "value",
     yKey: "period",
-    zKey: "areacd"
+    zKey: "areacd",
+    yFormat: "%Y",
+    yFormatDate: "%Y-%m-%d",
+    ySort: "ascending",
+    zSortKey: "E12000004"
   }
 
-    let clusteredBarConfig = {
-      variant: "clustered",
-      xKey: "value",
-      yKey: "areacd",
-      zKey: "period"
-    }
+  let clusteredBarConfig = {
+    variant: "clustered",
+    xKey: "value",
+    yKey: "areacd",
+    zKey: "period",
+    dataLabels: {format: ",.0f"},
+    ySort: "descending",
+    zSortKey: "2023-06-30"
+  }
+  
+  let smBarConfig = {
+    variant: "small-multiple",
+    xKey: "value",
+    yKey: "areacd",
+    zKey: "period",
+    xAxisTicks: 2,
+    zFormat: "%Y",
+    zFormatDate: "%Y-%m-%d",
+    ySort: "descending"
+  }
 
   function selectIndicator(selected) {
     indicator = !selected ? null : selected;
@@ -83,7 +103,7 @@
     <NavSection title="Stacked Bar">
       <LazyLoad>
         <div class="chart-container">
-          {#await fetchChartData(indicator.slug, "rgn")}
+          {#await fetchChartData(indicator.slug, "rgn", "2021,2022,2023,2024")}
             Fetching chart data
           {:then chartData}
             <BarChart data={chartData} {...stackedBarConfig}/>
@@ -101,6 +121,20 @@
           {:then chartData}
             {console.log(chartData)}
             <BarChart data={chartData} {...clusteredBarConfig}/>
+          {:catch}
+            Failed to load chart data
+          {/await}
+        </div>
+      </LazyLoad>
+    </NavSection>
+        <NavSection title="Small Multiple Bar">
+      <LazyLoad>
+        <div class="chart-container">
+          {#await fetchChartData(indicator.slug, "rgn", "2023,2024")}
+            Fetching chart data
+          {:then chartData}
+            {console.log(chartData)}
+            <BarChart data={chartData} {...smBarConfig}/>
           {:catch}
             Failed to load chart data
           {/await}
