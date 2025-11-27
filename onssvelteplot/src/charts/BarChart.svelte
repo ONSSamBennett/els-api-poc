@@ -28,7 +28,8 @@
         height,
         seriesHeight = 30,
         margin = {top: 20, bottom: 40, right: 80}, 
-        colours = ['#206095','#A8BD3A','#871A5B','#F66068']
+        colours = ['#206095','#A8BD3A','#871A5B','#F66068','#05341A','#27A0CC','#003C57','#22D0B6','#746CB1','#A09FA0'],
+        children
     } = $props();
 
     let domainX = $derived.by(() => {
@@ -132,7 +133,8 @@
         label:xAxisLabel ? xAxisLabel : ""
     }}
     color={{ 
-        legend: variant == "clustered" || variant == "stacked" ? true : false
+        legend: variant == "clustered" || variant == "stacked" ? true : false,
+        scheme: colours
     }}
     fy={{
         axis: 'left',
@@ -175,6 +177,9 @@
             textClass="dataLabel"
             fill={(d) => d[xKey] < domainX[1]*0.2 ? "#414042" : "#FFFFFF"}
         />
+    {/if}
+    {#if children}
+        {@render children()}
     {/if}
 </Plot>
 

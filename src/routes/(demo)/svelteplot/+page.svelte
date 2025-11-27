@@ -17,7 +17,9 @@
   import Bar from "$lib/viz/Bar.svelte";
   import Line from "$lib/viz/Line.svelte";
   import { fetchChartData } from "$lib/utils.js";
-  import { BarChart } from "@onsvisual/onssvelteplot"
+  import { BarChart, LineChart } from "@onsvisual/onssvelteplot"
+  import { RuleY } from "svelteplot"
+
 
   export let data;
 
@@ -41,7 +43,6 @@
     zKey: "areacd",
     yFormat: "%Y",
     yFormatDate: "%Y-%m-%d",
-    ySort: "ascending",
     xAxisTicks: 3
   }
 
@@ -52,7 +53,6 @@
     zKey: "period",
     dataLabels: {format: ",.0f"},
     ySort: "descending",
-    zSortKey: "2023-06-30"
   }
   
   let smBarConfig = {
@@ -64,6 +64,40 @@
     zFormat: "%Y",
     zFormatDate: "%Y-%m-%d",
     ySort: "descending"
+  }
+
+  let lineConfig = {
+    xKey: "period",
+    yKey: "value",
+    zKey: "areacd",
+    xFormatDate: "%Y-%m-%d",
+    xFormat: "%Y",
+    yFormat: ",.0f",
+    xAxisLabel: "Year",
+    yDomainMin: 0,
+    yDomainMax: "auto",
+    addEndMarkers: true,
+    directLabels: true,
+    tooltip: true,
+    xAxisTickInterval: {unit: 'years', step: '6'}
+  }
+
+  let focusLineConfig = {
+    variant: "focus",
+    xKey: "period",
+    yKey: "value",
+    zKey: "areacd",
+    xFormatDate: "%Y-%m-%d",
+    xFormat: "%Y",
+    yFormat: ",.0f",
+    xAxisLabel: "Year",
+    yDomainMin: 0,
+    yDomainMax: "auto",
+    addEndMarkers: true,
+    directLabels: false,
+    referenceGroup: "K02000001",
+    focusGroup: "E92000001",
+    xAxisTickInterval: {unit: 'years', step: '6'}
   }
 
   function selectIndicator(selected) {
@@ -104,7 +138,7 @@
     <NavSection title="Stacked Bar">
       <LazyLoad>
         <div class="chart-container">
-          {#await fetchChartData(indicator.slug, "rgn", "2021,2022,2023,2024")}
+          {#await fetchChartData(indicator.slug, "ctry", "2020,2021,2022,2023")}
             Fetching chart data
           {:then chartData}
             <BarChart data={chartData} {...stackedBarConfig}/>
@@ -117,7 +151,7 @@
     <NavSection title="Clustered Bar">
       <LazyLoad>
         <div class="chart-container">
-          {#await fetchChartData(indicator.slug, "rgn", "2023,2024")}
+          {#await fetchChartData(indicator.slug, "ctry", "2022,2023")}
             Fetching chart data
           {:then chartData}
             {console.log(chartData)}
@@ -136,6 +170,36 @@
           {:then chartData}
             {console.log(chartData)}
             <BarChart data={chartData} {...smBarConfig}/>
+          {:catch}
+            Failed to load chart data
+          {/await}
+        </div>
+      </LazyLoad>
+    </NavSection>
+    <NavSection title="Line">
+      <LazyLoad>
+        <div class="chart-container">
+          {#await fetchChartData(indicator.slug, "ctry", "all")}
+            Fetching chart data
+          {:then chartData}
+            {console.log(chartData)}
+            <LineChart data={chartData} {...lineConfig}>
+              <RuleY y={200}/>
+            </LineChart>
+          {:catch}
+            Failed to load chart data
+          {/await}
+        </div>
+      </LazyLoad>
+    </NavSection>
+    <NavSection title="Focus Line">
+      <LazyLoad>
+        <div class="chart-container">
+          {#await fetchChartData(indicator.slug, "ctry", "all")}
+            Fetching chart data
+          {:then chartData}
+            {console.log(chartData)}
+            <LineChart data={chartData} {...focusLineConfig}/>
           {:catch}
             Failed to load chart data
           {/await}
