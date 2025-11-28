@@ -21,18 +21,19 @@
         yDomainMax = "auto",
         yFormat,
         addEndMarkers,
+        addMarkers,
         directLabels,
         focusGroup,
         referenceGroup,
         focusLabels = ["Selected group", "Reference group", "All other groups"],
         tooltip,
+        hover,
         height = 350,
         margin = {top: 20, bottom: 40, right: 120}, 
-        colours = variant == "focus" ? ['#206095', '#27A0CC', '#D9D9D9'] : ['#206095','#A8BD3A','#871A5B','#F66068'],
+        colours = variant == "focus" ? ['#206095', '#27A0CC', '#C6C6C6'] : ['#206095','#A8BD3A','#871A5B','#F66068'],
         children
     } = $props();
 
-    let domainY = $state();
     let hovered = $state();
 
     $effect.pre(() => {
@@ -52,7 +53,6 @@
                     d.focusGroup = focusLabels[2]
                 }
             })
-            console.log(data)
         }
     })
 
@@ -127,17 +127,34 @@
         y={yKey}
         z={variant == "focus" ? "focusGroup" : zKey}
         fx={variant == "small-multiple" ? zKey : null}
-        lineClass={(d) => hovered ? hovered == d[zKey] ? "hovered" : "greyed" : ""}
-        stroke={hovered ? null : variant != "small-multiple" ? zKey : null}
+        lineClass={(d) => !hover ? "" : hovered == null ? "" : d.datum[zKey] == hovered[0][zKey] ? "hovered" : "greyed"}
+        stroke={variant != "small-multiple" ? zKey : null}
         strokeWidth={(d) => variant == "focus" && (d.focusGroup == focusLabels[0] || d.focusGroup == focusLabels[1]) ? 3 : variant == "focus" ? 2 : 3}
     />
-    {#if addEndMarkers}
+    {#if addEndMarkers && !addMarkers}
         <Dot
             data={variant == "focus" ? labels.filter((d) => d.focusGroup == focusLabels[0] || d.focusGroup == focusLabels[1]) : labels}
             x={xKey}
             y={yKey}
             fill={variant != "small-multiple" ? zKey : null}
+            symbol={domainZ.length <= 6 ? zKey : null}
+            stroke="white"
+            stroke-width={0.25}
             r={5}
+            dotClass={(d) => !hover ? "" : hovered == null ? "" : d[zKey] == hovered[0][zKey] ? "hovered" : "greyed"}
+        />
+    {/if}
+    {#if addMarkers}
+        <Dot
+            data={variant == "focus" ? data.filter((d) => d.focusGroup == focusLabels[0] || d.focusGroup == focusLabels[1]) : data}
+            x={xKey}
+            y={yKey}
+            fill={variant != "small-multiple" ? zKey : null}
+            symbol={domainZ.length <= 6 ? zKey : null}
+            stroke="white"
+            stroke-width={0.25}
+            r={5}
+            dotClass={(d) => !hover ? "" : hovered == null ? "" : d[zKey] == hovered[0][zKey] ? "hovered" : "hidden"}
         />
     {/if}
     <Pointer
@@ -146,20 +163,14 @@
         z={zKey}
         y={yKey}
         onupdate={(e) => {
-            console.log(e)
-            const event = Object.assign({}, e)
-            console.log(event)
+            if(e.length > 0){
+                hovered = e
+                console.log(hovered[0][zKey])
+            } else{
+                hovered = null;
+            }
         }}
         maxDistance={10}>
-        {#snippet children({ data })}
-            <Dot
-                {data}
-                x={xKey}
-                y={yKey}
-                fill={zKey}
-                r={5}
-                stroke="var(--svelteplot-bg)" />
-        {/snippet}
     </Pointer>
     
     {#snippet overlay()}
@@ -185,7 +196,8 @@
             x={xKey}
             y={yKey}
             z={zKey}
-            text={zKey}
+            text={(d) => !hover ? d[zKey] : hovered == null ? d[zKey] : d[zKey] == hovered[0][zKey] ? d[zKey] : ""}
+            textClass={(d) => !hover ? "" : hovered == null ? "" : d[zKey] == hovered[0][zKey] ? "hovered" : ""}
             textAnchor="start"
             dx="5"
             fill={variant != "small-multiple" ? zKey : null} />
@@ -222,6 +234,15 @@
         stroke: orange !important;
     }
     :global(.greyed path){
-        stroke: grey !important;
+        stroke: #C6C6C6 !important;
+    }
+    :global(.hovered){
+        fill: orange !important;
+    }
+    :global(.greyed){
+        fill: #C6C6C6 !important;
+    }
+    :global(.hidden){
+        display: none;
     }
 </style>

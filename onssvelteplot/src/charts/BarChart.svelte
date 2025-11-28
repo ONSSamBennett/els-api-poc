@@ -1,5 +1,5 @@
 <script>
-    import { Plot, GridX, BarX, AxisX, AxisY, Text, RuleX } from 'svelteplot';
+    import { Plot, GridX, BarX, AxisX, AxisY, Text, RuleX, Pointer } from 'svelteplot';
     import { format } from "d3-format";
     import { timeParse, timeFormat} from "d3-time-format"
     import { extent, min, max, sum, sort, ascending, descending } from "d3-array"
@@ -27,10 +27,13 @@
         tooltip,
         height,
         seriesHeight = 30,
-        margin = {top: 20, bottom: 40, right: 80}, 
+        hover = false,
+        margin = {top: 20, bottom: 40, right: 40, left: 80}, 
         colours = ['#206095','#A8BD3A','#871A5B','#F66068','#05341A','#27A0CC','#003C57','#22D0B6','#746CB1','#A09FA0'],
         children
     } = $props();
+
+    let hovered = $state();
 
     let domainX = $derived.by(() => {
         if(xDomain == "auto" && variant != "stacked"){
@@ -62,6 +65,7 @@
             }
         }
     })
+
 
     let domainY = $derived.by(() => {
         if(ySort == "ascending" && !zSortKey && variant == "stacked"){
@@ -118,6 +122,7 @@
 </script>
 
 <Plot 
+    marginLeft={margin.left}
     marginRight={margin.right} 
     marginTop={margin.top} 
     marginBottom={margin.bottom} 
@@ -141,7 +146,7 @@
         anchor: 'left',
         domain: variant == "clustered" ? domainY : null,
         axisOptions: {
-            dx: -margin.right - 10
+            dx: -margin.left
         }
     }}
     fx={{
@@ -163,6 +168,15 @@
         sort={!ySort ? false : ySort == "ascending" ? { channel: 'x' } : { channel: '-x' }}
         fill={variant == "stacked" || variant == "clustered" ? zKey : true}
     />
+    {#if hover}
+        <Pointer
+            data={data}
+            y={variant == "clustered" ? zKey : yKey}
+            onupdate={(e) => {
+                hovered = e
+                console.log(hovered)
+            }}/>
+    {/if}
 
     {#if dataLabels}
         <Text
@@ -171,7 +185,9 @@
             y={variant == "clustered" ? zKey : yKey}
             fy={variant == "clustered" ? yKey : null}
             fx={variant == "small-multiple" ? zKey : null}
-            textAnchor={(d) => d[xKey] < domainX[1]*0.2 ? "start" : "end"}
+            textAnchor={(d) => {
+                console.log(d)
+                return d[xKey] < domainX[1]*0.2 ? "start" : "end"}}
             dx={(d) => d[xKey] < domainX[1]*0.2 ? 4 : -4}
             text={(d) => dataLabels.format ? format(dataLabels.format)(d[xKey]) : d[xKey]}
             textClass="dataLabel"

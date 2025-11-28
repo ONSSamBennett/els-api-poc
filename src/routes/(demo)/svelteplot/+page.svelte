@@ -32,12 +32,12 @@
     yKey: "areacd",
     ySort: "ascending",
     dataLabels: {format: ",.0f"},
-    xAxisLabel: "Population"
+    xAxisLabel: "Population",
+    hover: true
   }
 
   let stackedBarConfig = {
     variant: "stacked",
-    height: 150,
     xKey: "value",
     yKey: "period",
     zKey: "areacd",
@@ -76,9 +76,10 @@
     xAxisLabel: "Year",
     yDomainMin: 0,
     yDomainMax: "auto",
-    addEndMarkers: true,
+    addMarkers: true,
     directLabels: true,
     tooltip: true,
+    hover: true,
     xAxisTickInterval: {unit: 'years', step: '6'}
   }
 
@@ -176,7 +177,7 @@
         </div>
       </LazyLoad>
     </NavSection>
-    <NavSection title="Line">
+    <NavSection title="Line with direct labels, hover and tooltip">
       <LazyLoad>
         <div class="chart-container">
           {#await fetchChartData(indicator.slug, "ctry", "all")}
@@ -184,7 +185,6 @@
           {:then chartData}
             {console.log(chartData)}
             <LineChart data={chartData} {...lineConfig}>
-              <RuleY y={200}/>
             </LineChart>
           {:catch}
             Failed to load chart data
